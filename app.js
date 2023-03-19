@@ -1,37 +1,43 @@
-import express from "express";
-import run from "./src/modules/extract.js";
-import dotenv from "dotenv";
-import client from "./src/modules/discord/client.js";
-import { Data } from "./src/modules/email.js";
+"use strict";
+
+const dotenv = require("dotenv");
+const cron = require("cron");
+
+const goToData = require("./src/modules/extract.js");
+const sequelize = require("./db/connection.js");
+const Nft = require("./src/models/Nft.js");
 
 dotenv.config();
-const port = process.env.PORT;
-const app = express();
 
-app.get("/send", (req, res) => {
-  res.sendFile("./documents/data.csv", { root: "./" });
-});
+const getConnection = (sequelize) => {
+  return new Promise((resolve, reject) => {
+    sequelize
+      .authenticate()
+      .then(() => {
+        console.log("Connection has been established successfully.");
+        resolve(sequelize);
+      })
+      .catch((err) => {
+        console.error("Unable to connect to the database:", err);
+        reject(sequelize);
+      });
+  });
+};
 
-app.listen(port, () => {
-  console.log("server is running");
+getConnection(sequelize).then(async () => {
+  //await sequelize.sync();
+  //await sequelize.sync({ force: true });
 
-  client.login(process.env.DISCORD_TOKEN);
+  const task = async () => {
+    const data = await goToData();
+    data.map(async (item) => {
+      await Nft.create(item)
+        .then((r) => r)
+        .catch((e) => {
+          process.exit(1);
+        });
+    });
+  };
 
-  setInterval(() => {
-    let now = new Date();
-    let currentHour = now.getUTCHours();
-
-    if (currentHour > 21 && currentHour < 23) {
-      run();
-    }
-  }, 1000 * 60 * 60);
-
-  setInterval(() => {
-    let now = new Date();
-    let currentHour = now.getUTCHours();
-
-    if (currentHour == 20) {
-      Data.sendEmail(process.env.DEFAULT_EMAIL);
-    }
-  }, 1000 * 60 * 60);
+  new cron.CronJob("0 0 19 * * *", task, null, true, "America/Sao_Paulo");
 });

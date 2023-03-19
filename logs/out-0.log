@@ -1,0 +1,4 @@
+19--03--2023 15:41 -03:00: Executing (default): SELECT 1+1 AS result
+19--03--2023 15:41 -03:00: Connection has been established successfully.
+19--03--2023 15:42 -03:00: Executing (default): SELECT 1+1 AS result
+19--03--2023 15:42 -03:00: Connection has been established successfully.

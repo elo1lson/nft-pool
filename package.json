@@ -1,24 +1,30 @@
 {
   "name": "nft",
   "version": "1.0.0",
-  "type": "module",
+  "type": "commonjs",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node --watch  app.js",
+    "start": "nodemon app.js",
+    "build": "pm2 start ./ecosystem.config.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "pkg": {
+    "target": [
+      "node19-linux-x64"
+    ]
+  },
+  "bin": "app.js",
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "axios": "^1.2.3",
-    "commander": "^10.0.0",
-    "csv-stringify": "^6.2.3",
-    "discord.js": "^14.7.1",
+    "cron": "^2.3.0",
     "dotenv": "^16.0.3",
-    "email-validator": "^2.0.4",
     "express": "^4.18.2",
-    "nodemailer": "^6.9.1"
+    "mariadb": "^3.1.0",
+    "nodemon": "^2.0.21",
+    "sequelize": "^6.29.0"
   }
 }
